@@ -1,6 +1,6 @@
 const { Store, Users } = require('../data-access');
 const asyncHandler = require('../utils/async-handler');
-const { isValidPhoneNumber, isValidHour, isvalidMinute } = require('../utils/regList');
+const { isValidPhoneNumber, isValidHour, isValidMinute } = require('../utils/regList');
 const multiImageAddress = require('../utils/multiImageAddressHandler');
 const photoLimit = require('../utils/photoLimit');
 
@@ -74,7 +74,7 @@ const createStore = asyncHandler(async (req, res) => {
         error.statusCode = 400;
         throw error;
     }
-    if (!isvalidMinute(businessHours[1], businessHours[3])) {
+    if (!isValidMinute(businessHours[1], businessHours[3])) {
         const error = new Error('분 형식에 맞게 작성해주세요.');
         error.statusCode = 400;
         throw error;
@@ -164,7 +164,7 @@ const updateStoreDetail = asyncHandler(async (req, res) => {
         error.statusCode = 400;
         throw error;
     }
-    if (!isvalidMinute(newBusinessHours[1], newBusinessHours[3])) {
+    if (!isValidMinute(newBusinessHours[1], newBusinessHours[3])) {
         const error = new Error('분 형식에 맞게 작성해주세요.');
         error.statusCode = 400;
         throw error;
