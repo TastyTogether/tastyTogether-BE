@@ -108,8 +108,6 @@ const getStoreInfo = asyncHandler(async (req, res) => {
         { new: true },
     ).populate('reviews');
     const storeReviewCount = storeInfo.reviews.length;
-    const userLikeList = storeInfo.storeLikes;
-    const storeLikeCount = userLikeList.length;
     const storeReviews = storeInfo.reviews;
     const userProfiles = await Promise.all(
         storeReviews.map(async (review) => {
@@ -123,7 +121,7 @@ const getStoreInfo = asyncHandler(async (req, res) => {
         const newReview = { ...storeReviews[i].toObject(), profileImage: userProfiles[i] };
         newStoreReviews.push(newReview);
     }
-    res.json({ storeInfo, storeReviewCount, storeLikeCount, newStoreReviews });
+    res.json({ storeInfo, storeReviewCount, newStoreReviews });
 });
 
 // 가게 정보 수정 api 서비스 로직
@@ -199,16 +197,15 @@ const isUserLike = (userLikeList, userId) =>
 const updateStoreLikes = asyncHandler(async (req, res) => {
     const { storeId } = req.params;
     const { userId } = req.userData;
-    // const userId = '64e2245ebef0ef0220e8d707';
     const storeInfo = await Store.findOne({ _id: storeId });
     const userLikeList = [...storeInfo.storeLikes];
     const likeIndex = isUserLike(userLikeList, userId);
     if (likeIndex === -1) {
         userLikeList.push(userId);
-        res.status(201);
+        res.status(201).json(userLikeList);
     } else {
         userLikeList.splice(likeIndex, 1);
-        res.status(200);
+        res.status(200).json(userLikeList);
     }
     await Store.updateOne({ _id: storeId }, { storeLikes: userLikeList });
     res.end();
