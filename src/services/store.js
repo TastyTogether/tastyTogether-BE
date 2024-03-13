@@ -1,6 +1,6 @@
 const { Store, Users } = require('../data-access');
 const asyncHandler = require('../utils/async-handler');
-const { isValidPhoneNumber, isValidHour, isvalidMinute } = require('../utils/regList');
+const { isValidPhoneNumber, isValidHour, isValidMinute } = require('../utils/regList');
 const multiImageAddress = require('../utils/multiImageAddressHandler');
 const photoLimit = require('../utils/photoLimit');
 
@@ -74,7 +74,7 @@ const createStore = asyncHandler(async (req, res) => {
         error.statusCode = 400;
         throw error;
     }
-    if (!isvalidMinute(businessHours[1], businessHours[3])) {
+    if (!isValidMinute(businessHours[1], businessHours[3])) {
         const error = new Error('분 형식에 맞게 작성해주세요.');
         error.statusCode = 400;
         throw error;
@@ -108,8 +108,6 @@ const getStoreInfo = asyncHandler(async (req, res) => {
         { new: true },
     ).populate('reviews');
     const storeReviewCount = storeInfo.reviews.length;
-    const userLikeList = storeInfo.storeLikes;
-    const storeLikeCount = userLikeList.length;
     const storeReviews = storeInfo.reviews;
     const userProfiles = await Promise.all(
         storeReviews.map(async (review) => {
@@ -123,7 +121,7 @@ const getStoreInfo = asyncHandler(async (req, res) => {
         const newReview = { ...storeReviews[i].toObject(), profileImage: userProfiles[i] };
         newStoreReviews.push(newReview);
     }
-    res.json({ storeInfo, storeReviewCount, storeLikeCount, newStoreReviews });
+    res.json({ storeInfo, storeReviewCount, newStoreReviews });
 });
 
 // 가게 정보 수정 api 서비스 로직
@@ -164,7 +162,7 @@ const updateStoreDetail = asyncHandler(async (req, res) => {
         error.statusCode = 400;
         throw error;
     }
-    if (!isvalidMinute(newBusinessHours[1], newBusinessHours[3])) {
+    if (!isValidMinute(newBusinessHours[1], newBusinessHours[3])) {
         const error = new Error('분 형식에 맞게 작성해주세요.');
         error.statusCode = 400;
         throw error;
@@ -199,16 +197,15 @@ const isUserLike = (userLikeList, userId) =>
 const updateStoreLikes = asyncHandler(async (req, res) => {
     const { storeId } = req.params;
     const { userId } = req.userData;
-    // const userId = '64e2245ebef0ef0220e8d707';
     const storeInfo = await Store.findOne({ _id: storeId });
     const userLikeList = [...storeInfo.storeLikes];
     const likeIndex = isUserLike(userLikeList, userId);
     if (likeIndex === -1) {
         userLikeList.push(userId);
-        res.status(201);
+        res.status(201).json(userLikeList);
     } else {
         userLikeList.splice(likeIndex, 1);
-        res.status(200);
+        res.status(200).json(userLikeList);
     }
     await Store.updateOne({ _id: storeId }, { storeLikes: userLikeList });
     res.end();

@@ -22,7 +22,7 @@ AWS.config.update({
 const multerConfig = {
     storage: multerS3({
         s3: new AWS.S3(),
-        bucket: 'tasty-together',
+        bucket: 'tastytogether',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         key(req, file, cb) {
             cb(null, `image/${Date.now()}-${file.fieldname}-${file.originalname}`);
